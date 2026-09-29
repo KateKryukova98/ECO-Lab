@@ -1,0 +1,1712 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Эко-лаборатория: сохраним планету вместе</title>
+<style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+        --primary: #1a5c3a;
+        --secondary: #2d8a5c;
+        --accent: #7ec850;
+        --accent-dark: #4a9e2f;
+        --warning: #f0ad4e;
+        --danger: #d9534f;
+        --bg-light: #f0f8f2;
+        --text: #2a3a2e;
+        --card-bg: #ffffff;
+        --earth: #8b6f47;
+        --water: #4a9ecf;
+        --sun: #f5c842;
+    }
+
+    body.dark {
+        --primary: #0d2a1a;
+        --secondary: #1a4a30;
+        --bg-light: #152018;
+        --text: #d8e8dc;
+        --card-bg: #1e3028;
+    }
+
+    body {
+        font-family: 'Segoe UI', Arial, sans-serif;
+        line-height: 1.6;
+        color: var(--text);
+        background: var(--card-bg);
+        transition: background 0.4s, color 0.4s;
+    }
+
+    /* Прогресс-бар прокрутки */
+    #progressBar {
+        position: fixed;
+        top: 0; left: 0;
+        height: 4px;
+        background: linear-gradient(90deg, var(--accent), var(--accent-dark));
+        width: 0%;
+        z-index: 1000;
+        transition: width 0.1s;
+    }
+
+    /* Шапка */
+    header {
+        background: linear-gradient(135deg, var(--primary), var(--secondary));
+        color: white;
+        padding: 12px 40px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        box-shadow: 0 2px 15px rgba(0,0,0,0.2);
+        flex-wrap: wrap;
+        gap: 15px;
+    }
+
+    .logo {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 1.1rem;
+        font-weight: 700;
+    }
+
+    nav { display: flex; gap: 18px; align-items: center; flex-wrap: wrap; }
+
+    nav a {
+        color: white;
+        text-decoration: none;
+        font-size: 0.88rem;
+        transition: opacity 0.3s;
+        cursor: pointer;
+    }
+    nav a:hover { opacity: 0.7; }
+
+    /* XP-панель */
+    .xp-panel {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        background: rgba(255,255,255,0.15);
+        padding: 6px 14px;
+        border-radius: 30px;
+        border: 1px solid rgba(255,255,255,0.25);
+    }
+    .xp-level {
+        background: var(--accent);
+        color: white;
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        font-size: 1rem;
+    }
+    .xp-info { font-size: 0.85rem; }
+    .xp-bar-mini {
+        width: 80px;
+        height: 6px;
+        background: rgba(255,255,255,0.3);
+        border-radius: 3px;
+        overflow: hidden;
+        margin-top: 3px;
+    }
+    .xp-bar-mini-fill {
+        height: 100%;
+        background: var(--accent);
+        width: 0%;
+        transition: width 0.5s;
+    }
+    .xp-count { font-size: 0.8rem; opacity: 0.9; }
+
+    .theme-toggle {
+        background: rgba(255,255,255,0.15);
+        border: 1px solid rgba(255,255,255,0.3);
+        color: white;
+        padding: 6px 12px;
+        border-radius: 20px;
+        cursor: pointer;
+        font-size: 1rem;
+        transition: background 0.3s;
+    }
+    .theme-toggle:hover { background: rgba(255,255,255,0.3); }
+
+    /* Hero */
+    .hero {
+        background: linear-gradient(135deg, #1a5c3a, #2d8a5c, #7ec850);
+        background-size: 200% 200%;
+        animation: gradientShift 12s ease infinite;
+        color: white;
+        padding: 70px 20px;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .hero::after {
+        content: '';
+        position: absolute;
+        bottom: -50px;
+        right: -50px;
+        width: 300px;
+        height: 300px;
+        background: radial-gradient(circle, rgba(255,255,255,0.15), transparent 70%);
+        border-radius: 50%;
+    }
+
+    @keyframes gradientShift {
+        0%, 100% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+    }
+
+    .hero-content {
+        max-width: 1150px;
+        margin: 0 auto;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 40px;
+        align-items: center;
+    }
+
+    .hero-text .eyebrow {
+        font-size: 0.8rem;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        opacity: 0.85;
+        margin-bottom: 15px;
+    }
+
+    .hero h2 {
+        font-size: 2.6rem;
+        margin-bottom: 20px;
+        line-height: 1.15;
+    }
+
+    .hero p {
+        font-size: 1.1rem;
+        opacity: 0.95;
+        margin-bottom: 30px;
+        max-width: 500px;
+    }
+
+    .hero-tags {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        margin-bottom: 30px;
+    }
+    .hero-tag {
+        background: rgba(255,255,255,0.15);
+        border: 1px solid rgba(255,255,255,0.3);
+        padding: 6px 16px;
+        border-radius: 20px;
+        font-size: 0.85rem;
+    }
+
+    .hero-card {
+        background: rgba(255,255,255,0.1);
+        border: 2px solid rgba(255,255,255,0.3);
+        border-radius: 20px;
+        padding: 40px;
+        text-align: center;
+        backdrop-filter: blur(10px);
+    }
+    .hero-card .emoji { font-size: 5rem; margin-bottom: 15px; display: block; }
+    .hero-card h4 { font-size: 1.3rem; margin-bottom: 10px; }
+    .hero-card p { font-size: 0.9rem; opacity: 0.9; margin: 0; }
+
+    .btn {
+        display: inline-block;
+        background: var(--accent);
+        color: white;
+        padding: 13px 34px;
+        border-radius: 50px;
+        text-decoration: none;
+        font-size: 1rem;
+        transition: transform 0.3s, box-shadow 0.3s;
+        border: none;
+        cursor: pointer;
+        font-weight: 600;
+    }
+    .btn:hover { transform: translateY(-3px); box-shadow: 0 10px 25px rgba(0,0,0,0.3); }
+    .btn-outline {
+        background: transparent;
+        border: 2px solid white;
+        color: white;
+    }
+    .btn-outline:hover { background: white; color: var(--primary); }
+    .btn-sm { padding: 8px 20px; font-size: 0.9rem; }
+
+    /* Секции */
+    section {
+        padding: 65px 40px;
+        max-width: 1150px;
+        margin: 0 auto;
+    }
+
+    .step-label {
+        font-size: 0.78rem;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        color: var(--accent-dark);
+        margin-bottom: 10px;
+        font-weight: 600;
+    }
+
+    section h3 {
+        font-size: 1.9rem;
+        color: var(--primary);
+        margin-bottom: 15px;
+    }
+    body.dark section h3 { color: #9ed880; }
+
+    .section-subtitle {
+        color: #666;
+        margin-bottom: 40px;
+        max-width: 700px;
+        font-size: 1rem;
+    }
+    body.dark .section-subtitle { color: #aaa; }
+
+    /* Карточки */
+    .cards {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+        gap: 22px;
+    }
+
+    .card {
+        background: var(--card-bg);
+        border-radius: 15px;
+        padding: 26px;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.07);
+        transition: transform 0.3s, box-shadow 0.3s;
+        border-top: 4px solid var(--accent);
+    }
+    .card:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 12px 30px rgba(0,0,0,0.12);
+    }
+    .card h4 {
+        color: var(--primary);
+        margin-bottom: 12px;
+        font-size: 1.15rem;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    body.dark .card h4 { color: #9ed880; }
+    .card .card-icon { font-size: 1.6rem; }
+
+    /* Анимация появления */
+    .fade-in {
+        opacity: 0;
+        transform: translateY(30px);
+        transition: opacity 0.7s, transform 0.7s;
+    }
+    .fade-in.visible {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    /* Теория — блоки */
+    .theory-block {
+        background: var(--card-bg);
+        border-radius: 15px;
+        padding: 28px;
+        margin-bottom: 18px;
+        box-shadow: 0 4px 18px rgba(0,0,0,0.06);
+        border-left: 5px solid var(--accent);
+    }
+    .theory-block h5 {
+        color: var(--primary);
+        font-size: 1.15rem;
+        margin-bottom: 12px;
+    }
+    body.dark .theory-block h5 { color: #9ed880; }
+    .theory-block p { color: #555; margin-bottom: 10px; }
+    body.dark .theory-block p { color: #bbb; }
+    .theory-block ul { margin-left: 22px; color: #555; }
+    body.dark .theory-block ul { color: #bbb; }
+    .theory-block li { margin-bottom: 6px; }
+
+    /* Факты */
+    .fact-box {
+        background: linear-gradient(135deg, #e8f5e9, #c8e6c9);
+        border-radius: 15px;
+        padding: 25px;
+        margin: 20px 0;
+        border-left: 5px solid var(--accent-dark);
+    }
+    body.dark .fact-box { background: linear-gradient(135deg, #1a3025, #1e4030); }
+    .fact-box h5 {
+        color: var(--primary);
+        margin-bottom: 12px;
+        font-size: 1.05rem;
+    }
+    body.dark .fact-box h5 { color: #9ed880; }
+    .fact-box p { color: #2a3a2e; font-size: 0.95rem; }
+    body.dark .fact-box p { color: #d8e8dc; }
+
+    /* Игра «Сортируй отходы» */
+    .game-container {
+        background: var(--bg-light);
+        border-radius: 20px;
+        padding: 35px;
+        max-width: 850px;
+        margin: 0 auto;
+    }
+    .game-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 25px;
+        flex-wrap: wrap;
+        gap: 12px;
+    }
+    .game-score {
+        font-size: 1.1rem;
+        font-weight: bold;
+        color: var(--primary);
+        background: white;
+        padding: 8px 18px;
+        border-radius: 25px;
+    }
+    body.dark .game-score { background: #1e3028; color: #9ed880; }
+
+    .waste-item {
+        background: white;
+        border-radius: 15px;
+        padding: 30px;
+        text-align: center;
+        margin-bottom: 25px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+    }
+    body.dark .waste-item { background: #1e3028; }
+    .waste-item .waste-emoji { font-size: 4rem; margin-bottom: 12px; display: block; }
+    .waste-item .waste-name { font-size: 1.3rem; font-weight: bold; color: var(--primary); }
+    body.dark .waste-item .waste-name { color: #9ed880; }
+
+    .bins {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 15px;
+        margin-bottom: 20px;
+    }
+    .bin {
+        padding: 20px 10px;
+        border-radius: 15px;
+        text-align: center;
+        cursor: pointer;
+        transition: transform 0.3s, box-shadow 0.3s;
+        border: 3px solid transparent;
+        color: white;
+        font-weight: 600;
+        font-size: 0.9rem;
+    }
+    .bin:hover { transform: translateY(-4px); box-shadow: 0 8px 20px rgba(0,0,0,0.2); }
+    .bin .bin-emoji { font-size: 2rem; display: block; margin-bottom: 8px; }
+    .bin-blue { background: #4a9ecf; }
+    .bin-green { background: #4a9e2f; }
+    .bin-yellow { background: #f5c842; color: #333; }
+    .bin-red { background: #d9534f; }
+    .bin.correct { border-color: #1a5c3a; box-shadow: 0 0 0 5px rgba(126,200,80,0.4); }
+    .bin.wrong { border-color: #d9534f; box-shadow: 0 0 0 5px rgba(217,83,79,0.3); animation: shake 0.4s; }
+
+    @keyframes shake {
+        0%, 100% { transform: translateX(0); }
+        25% { transform: translateX(-6px); }
+        75% { transform: translateX(6px); }
+    }
+
+    .game-feedback {
+        padding: 15px 20px;
+        border-radius: 12px;
+        font-weight: 500;
+        display: none;
+        margin-top: 15px;
+    }
+    .game-feedback.show { display: block; }
+    .game-feedback.success { background: #d4edda; color: #155724; }
+    .game-feedback.error { background: #f8d7da; color: #721c24; }
+
+    /* Калькулятор следа */
+    .calc-container {
+        background: var(--bg-light);
+        border-radius: 20px;
+        padding: 35px;
+        max-width: 700px;
+        margin: 0 auto;
+    }
+    .calc-group { margin-bottom: 25px; }
+    .calc-group label {
+        display: block;
+        font-weight: 600;
+        margin-bottom: 10px;
+        color: var(--primary);
+    }
+    body.dark .calc-group label { color: #9ed880; }
+    .calc-group input[type="range"] {
+        width: 100%;
+        accent-color: var(--accent-dark);
+    }
+    .calc-group .range-value {
+        font-size: 1.1rem;
+        font-weight: bold;
+        color: var(--accent-dark);
+        float: right;
+    }
+    .calc-result {
+        background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+        color: white;
+        padding: 25px;
+        border-radius: 15px;
+        text-align: center;
+        margin-top: 25px;
+    }
+    .calc-result .big-number { font-size: 2.5rem; font-weight: bold; display: block; }
+    .calc-result .unit { font-size: 1rem; opacity: 0.9; }
+    .calc-tip {
+        background: white;
+        border-radius: 10px;
+        padding: 15px;
+        margin-top: 15px;
+        font-size: 0.9rem;
+        color: #333;
+    }
+    body.dark .calc-tip { background: #1e3028; color: #d8e8dc; }
+
+    /* Тест */
+    .quiz-container {
+        background: var(--bg-light);
+        border-radius: 20px;
+        padding: 35px;
+        max-width: 750px;
+        margin: 0 auto;
+    }
+    .quiz-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 25px;
+        padding-bottom: 15px;
+        border-bottom: 2px solid rgba(0,0,0,0.08);
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+    .quiz-progress-text {
+        font-weight: 600;
+        color: var(--primary);
+    }
+    body.dark .quiz-progress-text { color: #9ed880; }
+    .quiz-timer {
+        font-size: 1.2rem;
+        font-weight: bold;
+        color: var(--danger);
+        background: white;
+        padding: 8px 18px;
+        border-radius: 25px;
+    }
+    body.dark .quiz-timer { background: #1e3028; }
+
+    .question { margin-bottom: 25px; }
+    .question p { font-weight: bold; margin-bottom: 12px; font-size: 1.05rem; }
+    .question label {
+        display: block;
+        padding: 12px 18px;
+        margin-bottom: 8px;
+        background: var(--card-bg);
+        border-radius: 10px;
+        cursor: pointer;
+        transition: background 0.3s, transform 0.2s;
+        border: 2px solid transparent;
+    }
+    .question label:hover {
+        background: #e8f5e9;
+        transform: translateX(5px);
+    }
+    body.dark .question label:hover { background: #2a4a35; }
+    .question input { margin-right: 10px; }
+
+    /* ИИ-помощник */
+    .ai-container {
+        background: var(--bg-light);
+        border-radius: 20px;
+        padding: 30px;
+        max-width: 750px;
+        margin: 0 auto;
+    }
+    .ai-chat {
+        background: white;
+        border-radius: 15px;
+        padding: 20px;
+        min-height: 120px;
+        margin-bottom: 15px;
+        border: 1px solid rgba(0,0,0,0.08);
+    }
+    body.dark .ai-chat { background: #1e3028; border-color: rgba(255,255,255,0.1); }
+    .ai-message {
+        background: #e8f5e9;
+        padding: 12px 18px;
+        border-radius: 12px;
+        margin-bottom: 10px;
+        max-width: 85%;
+    }
+    body.dark .ai-message { background: #2a4a35; color: #d8e8dc; }
+    .ai-message .ai-role {
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: var(--accent-dark);
+        margin-bottom: 5px;
+        font-weight: 600;
+    }
+    .ai-suggestions {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        margin-bottom: 15px;
+    }
+    .ai-suggestion {
+        background: white;
+        border: 1px solid var(--accent);
+        color: var(--primary);
+        padding: 8px 15px;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        cursor: pointer;
+        transition: background 0.3s;
+    }
+    body.dark .ai-suggestion { background: #1e3028; color: #9ed880; }
+    .ai-suggestion:hover { background: var(--accent); color: white; }
+    .ai-input-group {
+        display: flex;
+        gap: 10px;
+    }
+    .ai-input {
+        flex: 1;
+        padding: 12px 18px;
+        border: 1px solid rgba(0,0,0,0.15);
+        border-radius: 25px;
+        font-size: 0.95rem;
+        font-family: inherit;
+        background: white;
+        color: var(--text);
+    }
+    body.dark .ai-input { background: #1e3028; border-color: rgba(255,255,255,0.15); }
+    .ai-input:focus { outline: 2px solid var(--accent); }
+
+    /* Значки */
+    .badges-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 15px;
+    }
+    .badge {
+        background: var(--card-bg);
+        border-radius: 15px;
+        padding: 20px;
+        text-align: center;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.06);
+        transition: transform 0.3s;
+        opacity: 0.4;
+        filter: grayscale(0.8);
+    }
+    .badge.earned {
+        opacity: 1;
+        filter: none;
+        border: 2px solid var(--accent);
+        background: linear-gradient(135deg, #f0f8f2, #e8f5e9);
+    }
+    body.dark .badge.earned { background: linear-gradient(135deg, #1a3025, #1e4030); }
+    .badge:hover { transform: translateY(-4px); }
+    .badge-icon {
+        font-size: 2.2rem;
+        display: block;
+        margin-bottom: 10px;
+    }
+    .badge-name { font-weight: 600; color: var(--primary); font-size: 0.95rem; }
+    body.dark .badge-name { color: #9ed880; }
+    .badge-desc { font-size: 0.8rem; color: #666; margin-top: 5px; }
+    body.dark .badge-desc { color: #aaa; }
+
+    /* Уровни */
+    .levels-track {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        justify-content: center;
+        margin-bottom: 25px;
+    }
+    .level-pill {
+        padding: 10px 20px;
+        background: var(--card-bg);
+        border-radius: 25px;
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: #999;
+        border: 2px solid transparent;
+        transition: all 0.3s;
+    }
+    .level-pill.active {
+        background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+        color: white;
+        box-shadow: 0 5px 15px rgba(126,200,80,0.4);
+    }
+    .level-pill.reached {
+        color: var(--primary);
+        border-color: var(--accent);
+    }
+    body.dark .level-pill.reached { color: #9ed880; }
+
+    /* Прогресс-бар большой */
+    .big-progress {
+        background: var(--bg-light);
+        border-radius: 20px;
+        padding: 30px;
+        max-width: 700px;
+        margin: 0 auto 30px;
+        text-align: center;
+    }
+    .big-progress .current-level {
+        font-size: 1.8rem;
+        font-weight: bold;
+        color: var(--primary);
+        margin-bottom: 10px;
+    }
+    body.dark .big-progress .current-level { color: #9ed880; }
+    .big-progress .progress-line {
+        height: 15px;
+        background: rgba(0,0,0,0.08);
+        border-radius: 10px;
+        overflow: hidden;
+        margin: 15px 0;
+    }
+    body.dark .big-progress .progress-line { background: rgba(255,255,255,0.1); }
+    .big-progress .progress-fill {
+        height: 100%;
+        background: linear-gradient(90deg, var(--accent), var(--accent-dark));
+        width: 0%;
+        transition: width 0.5s;
+        border-radius: 10px;
+    }
+    .big-progress .progress-text {
+        color: #666;
+        font-size: 0.95rem;
+    }
+    body.dark .big-progress .progress-text { color: #aaa; }
+
+    /* Аккордеон */
+    .accordion-item {
+        background: var(--card-bg);
+        border-radius: 10px;
+        margin-bottom: 12px;
+        overflow: hidden;
+        box-shadow: 0 3px 12px rgba(0,0,0,0.06);
+    }
+    .accordion-header {
+        padding: 18px 24px;
+        cursor: pointer;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-weight: 600;
+        color: var(--primary);
+        transition: background 0.3s;
+    }
+    body.dark .accordion-header { color: #9ed880; }
+    .accordion-header:hover { background: var(--bg-light); }
+    .accordion-header::after {
+        content: '＋';
+        font-size: 1.3rem;
+        transition: transform 0.3s;
+    }
+    .accordion-item.active .accordion-header::after { content: '−'; }
+    .accordion-body {
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.4s ease, padding 0.3s;
+        padding: 0 24px;
+    }
+    .accordion-item.active .accordion-body {
+        max-height: 500px;
+        padding: 0 24px 20px;
+    }
+
+    /* Кейсы */
+    .case-card {
+        background: var(--card-bg);
+        border-radius: 15px;
+        padding: 25px;
+        margin-bottom: 18px;
+        box-shadow: 0 4px 18px rgba(0,0,0,0.06);
+        border-left: 5px solid var(--warning);
+    }
+    .case-card h5 { color: var(--primary); margin-bottom: 10px; font-size: 1.1rem; }
+    body.dark .case-card h5 { color: #9ed880; }
+    .case-questions {
+        margin-top: 15px;
+        padding-top: 15px;
+        border-top: 1px dashed rgba(0,0,0,0.1);
+    }
+    body.dark .case-questions { border-top-color: rgba(255,255,255,0.1); }
+    .case-questions li { margin-left: 20px; margin-bottom: 6px; color: #555; }
+    body.dark .case-questions li { color: #bbb; }
+
+    /* Результат */
+    #quizResult {
+        margin-top: 20px;
+        padding: 20px;
+        border-radius: 12px;
+        font-weight: bold;
+        text-align: center;
+        display: none;
+    }
+    #quizResult.show { display: block; }
+
+    /* Тост (уведомление о значке) */
+    .toast {
+        position: fixed;
+        bottom: 30px;
+        right: 30px;
+        background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+        color: white;
+        padding: 18px 25px;
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        z-index: 999;
+        transform: translateX(400px);
+        transition: transform 0.5s;
+        max-width: 350px;
+    }
+    .toast.show { transform: translateX(0); }
+    .toast .toast-icon { font-size: 2rem; }
+    .toast .toast-text { font-size: 0.9rem; }
+    .toast .toast-title { font-weight: bold; margin-bottom: 3px; }
+
+    /* Подвал */
+    footer {
+        background: var(--primary);
+        color: white;
+        padding: 45px 40px 25px;
+        margin-top: 40px;
+    }
+    footer .footer-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 30px;
+        max-width: 1100px;
+        margin: 0 auto 30px;
+    }
+    footer h6 {
+        font-size: 1rem;
+        margin-bottom: 12px;
+        color: #9ed880;
+    }
+    footer p, footer ul { font-size: 0.88rem; opacity: 0.85; }
+    footer ul { list-style: none; }
+    footer li { margin-bottom: 6px; }
+    footer a { color: #9ed880; text-decoration: none; }
+    footer a:hover { text-decoration: underline; }
+    .footer-bottom {
+        text-align: center;
+        padding-top: 20px;
+        border-top: 1px solid rgba(255,255,255,0.15);
+        font-size: 0.85rem;
+        opacity: 0.7;
+    }
+
+    /* Адаптивность */
+    @media (max-width: 768px) {
+        header { padding: 12px 20px; flex-direction: column; }
+        .hero-content { grid-template-columns: 1fr; gap: 25px; }
+        .hero h2 { font-size: 1.8rem; }
+        section { padding: 45px 18px; }
+        section h3 { font-size: 1.4rem; }
+        .bins { grid-template-columns: repeat(2, 1fr); }
+        .toast { right: 15px; left: 15px; max-width: none; }
+    }
+</style>
+</head>
+<body>
+
+<div id="progressBar"></div>
+
+<!-- Шапка -->
+<header>
+    <div class="logo">
+        <span>🌍</span>
+        <span>Эко-лаборатория</span>
+    </div>
+    <nav>
+        <a onclick="scrollToSection('theory')">Теория</a>
+        <a onclick="scrollToSection('sorting')">Сортировка</a>
+        <a onclick="scrollToSection('calculator')">Калькулятор</a>
+        <a onclick="scrollToSection('quiz')">Тест</a>
+        <a onclick="scrollToSection('ai')">ИИ-помощник</a>
+        <a onclick="scrollToSection('badges')">Достижения</a>
+    </nav>
+    <div class="xp-panel">
+        <div class="xp-level" id="xpLevel">1</div>
+        <div>
+            <div class="xp-info" id="xpTitle">Эко-новичок</div>
+            <div class="xp-bar-mini">
+                <div class="xp-bar-mini-fill" id="xpBarMini"></div>
+            </div>
+        </div>
+        <div class="xp-count" id="xpCount">0 XP</div>
+        <button class="theme-toggle" onclick="toggleTheme()" id="themeBtn">🌙</button>
+    </div>
+</header>
+
+<!-- Hero -->
+<div class="hero">
+    <div class="hero-content">
+        <div class="hero-text">
+            <div class="eyebrow">Урок экологии · 7-11 класс · 45 минут</div>
+            <h2>Эко-лаборатория: сохраним планету вместе</h2>
+            <p>Научись сортировать отходы, рассчитывать углеродный след и понимать, как каждый день заботиться о планете. Проходи задания, получай опыт и становись Эко-хранителем Земли.</p>
+            <div class="hero-tags">
+                <span class="hero-tag">🌱 Сортировка мусора</span>
+                <span class="hero-tag">💧 Экономия воды</span>
+                <span class="hero-tag">⚡ Энергия</span>
+                <span class="hero-tag">🌍 Углеродный след</span>
+            </div>
+            <button class="btn" onclick="scrollToSection('theory')">Начать урок</button>
+        </div>
+        <div class="hero-card">
+            <span class="emoji">🌎</span>
+            <h4>Стань Эко-хранителем</h4>
+            <p>6 уровней, 10 значков, реальные навыки для жизни</p>
+        </div>
+    </div>
+</div>
+
+<!-- ШАГ 1: Теория -->
+<section id="theory" class="fade-in">
+    <div class="step-label">Шаг 1 · Теория</div>
+    <h3>Что нужно знать</h3>
+    <p class="section-subtitle">Прочитайте четыре блока. За дочитывание до конца вы получите значок «Теоретик» и +10 XP.</p>
+
+    <div class="theory-block">
+        <h5>♻️ Что такое экология и зачем её изучать</h5>
+        <p>Экология — наука о взаимодействии живых организмов и окружающей среды. Сегодня это ещё и практика: как человек влияет на природу и как может уменьшить свой вред.</p>
+        <ul>
+            <li>Каждый год в мире образуется более 2 млрд тонн отходов</li>
+            <li>Пластик разлагается от 400 до 1000 лет</li>
+            <li>Один человек в России производит около 400 кг мусора в год</li>
+        </ul>
+    </div>
+
+    <div class="theory-block">
+        <h5>🗂 Виды отходов и как их сортировать</h5>
+        <p>Отходы делятся на несколько категорий. Правильная сортировка позволяет переработать до 80% мусора.</p>
+        <ul>
+            <li><strong>Синий бак</strong> — пластик, стекло, бумага, металл (перерабатываемые)</li>
+            <li><strong>Зелёный бак</strong> — органические отходы (пищевые, растительные)</li>
+            <li><strong>Жёлтый бак</strong> — опасные отходы (батарейки, лампы, лекарства)</li>
+            <li><strong>Красный бак</strong> — неперерабатываемые (смешанные, загрязнённые)</li>
+        </ul>
+    </div>
+
+    <div class="theory-block">
+        <h5>🌍 Углеродный след</h5>
+        <p>Углеродный след — это количество парниковых газов, которое производит человек, организация или товар. Измеряется в килограммах CO₂-эквивалента.</p>
+        <ul>
+            <li>Поездка на машине 10 км — около 2 кг CO₂</li>
+            <li>Один авиаперелёт Москва–Сочи — около 150 кг CO₂</li>
+            <li>Средний россиянин производит около 12 тонн CO₂ в год</li>
+        </ul>
+    </div>
+
+    <div class="theory-block">
+        <h5>💡 Что может сделать каждый</h5>
+        <p>Экология начинается с малого. Вот 5 простых привычек, которые реально работают:</p>
+        <ul>
+            <li>Сортировать отходы и сдавать переработку</li>
+            <li>Использовать многоразовые сумки и бутылки</li>
+            <li>Экономить воду и электричество</li>
+            <li>Выбирать товары без лишней упаковки</li>
+            <li>Сдавать батарейки и опасные отходы в специальные пункты</li>
+        </ul>
+    </div>
+
+    <div class="fact-box">
+        <h5>💚 А ты знал?</h5>
+        <p>Из 1 тонны переработанного пластика можно сделать 2000 футболок или 500 спальных мешков. Переработка стекла экономит 30% энергии по сравнению с производством из сырья.</p>
+    </div>
+
+    <button class="btn" onclick="claimBadge('theorist'); scrollToSection('sorting');">Я дочитал — получить +10 XP и значок</button>
+</section>
+
+<!-- ШАГ 2: Игра «Сортируй отходы» -->
+<section id="sorting" style="background: var(--bg-light);" class="fade-in">
+    <div class="step-label">Шаг 2 · Практика</div>
+    <h3>♻️ Игра «Сортируй отходы»</h3>
+    <p class="section-subtitle">Определи, в какой бак нужно выбросить предмет. За 10 правильных ответов — значок «Сортировщик» и +30 XP.</p>
+
+    <div class="game-container">
+        <div class="game-header">
+            <div class="game-score">Правильно: <span id="sortScore">0</span> / 10</div>
+            <div class="game-score">Ошибок: <span id="sortErrors">0</span></div>
+        </div>
+
+        <div class="waste-item">
+            <span class="waste-emoji" id="wasteEmoji">🍶</span>
+            <div class="waste-name" id="wasteName">Пластиковая бутылка</div>
+        </div>
+
+        <div class="bins">
+            <div class="bin bin-blue" onclick="sortWaste('blue')">
+                <span class="bin-emoji">♻️</span>
+                Переработка
+            </div>
+            <div class="bin bin-green" onclick="sortWaste('green')">
+                <span class="bin-emoji">🌿</span>
+                Органика
+            </div>
+            <div class="bin bin-yellow" onclick="sortWaste('yellow')">
+                <span class="bin-emoji">⚠️</span>
+                Опасные
+            </div>
+            <div class="bin bin-red" onclick="sortWaste('red')">
+                <span class="bin-emoji">🚮</span>
+                Смешанные
+            </div>
+        </div>
+
+        <div class="game-feedback" id="sortFeedback"></div>
+        <button class="btn" id="sortNextBtn" onclick="nextWaste()" style="display: none; margin: 15px auto 0;">Следующий предмет →</button>
+        <button class="btn" id="sortStartBtn" onclick="startSortGame()" style="margin: 15px auto 0;">Начать игру</button>
+    </div>
+</section>
+
+<!-- ШАГ 3: Калькулятор углеродного следа -->
+<section id="calculator" class="fade-in">
+    <div class="step-label">Шаг 3 · Конструктор</div>
+    <h3>🧮 Рассчитай свой углеродный след</h3>
+    <p class="section-subtitle">Подвигай ползунки — и узнай, сколько CO₂ ты производишь в год. Получи значок «Следопыт» и +25 XP.</p>
+
+    <div class="calc-container">
+        <div class="calc-group">
+            <label>🚗 Км на машине в неделю <span class="range-value" id="carValue">50 км</span></label>
+            <input type="range" id="carRange" min="0" max="500" value="50" oninput="updateCalc()">
+        </div>
+        <div class="calc-group">
+            <label>✈️ Авиаперелёты в год <span class="range-value" id="flyValue">1</span></label>
+            <input type="range" id="flyRange" min="0" max="20" value="1" oninput="updateCalc()">
+        </div>
+        <div class="calc-group">
+            <label>🍔 Порций мяса в неделю <span class="range-value" id="meatValue">5</span></label>
+            <input type="range" id="meatRange" min="0" max="21" value="5" oninput="updateCalc()">
+        </div>
+        <div class="calc-group">
+            <label>💡 Часов с включённым светом в день <span class="range-value" id="lightValue">6</span></label>
+            <input type="range" id="lightRange" min="0" max="24" value="6" oninput="updateCalc()">
+        </div>
+
+        <div class="calc-result">
+            <div>Твой углеродный след:</div>
+            <span class="big-number" id="calcTotal">0</span>
+            <span class="unit">кг CO₂ в год</span>
+            <div class="calc-tip" id="calcTip">Подвигай ползунки, чтобы увидеть результат</div>
+        </div>
+
+        <button class="btn" onclick="claimBadge('tracker')" style="display: block; margin: 20px auto 0;">Зафиксировать результат (+25 XP)</button>
+    </div>
+</section>
+
+<!-- ШАГ 4: Тест -->
+<section id="quiz" style="background: var(--bg-light);" class="fade-in">
+    <div class="step-label">Шаг 4 · Проверка</div>
+    <h3>🧠 Тест по теме урока</h3>
+    <p class="section-subtitle">5 вопросов. Отметьте ответы и нажмите «Проверить». За все правильные ответы — значок «Отличник» и +50 XP.</p>
+
+    <div class="quiz-container">
+        <div class="quiz-header">
+            <span class="quiz-progress-text" id="quizProgress">Вопрос 1 из 5</span>
+            <span class="quiz-timer" id="quizTimer">⏱ 60</span>
+        </div>
+        <form id="quizForm"></form>
+        <div id="quizResult"></div>
+        <button class="btn" id="quizStartBtn" onclick="startQuiz()" style="display: block; margin: 20px auto 0;">Начать тест</button>
+        <button class="btn" id="quizNextBtn" onclick="nextQuestion()" style="display: none; margin: 20px auto 0;">Ответить →</button>
+    </div>
+</section>
+
+<!-- ШАГ 5: ИИ-помощник -->
+<section id="ai" class="fade-in">
+    <div class="step-label">Шаг 5 · Вопросы</div>
+    <h3>🤖 ИИ-помощник «Спроси эколога»</h3>
+    <p class="section-subtitle">Задай вопрос об экологии — помощник объяснит простым языком. За первый вопрос — значок «Любознательный» и +15 XP.</p>
+
+    <div class="ai-container">
+        <div class="ai-chat" id="aiChat">
+            <div class="ai-message">
+                <div class="ai-role">Эколог</div>
+                Привет! Я помогу разобраться с экологией. Спроси что-нибудь или выбери вопрос ниже.
+            </div>
+        </div>
+        <div class="ai-suggestions">
+            <div class="ai-suggestion" onclick="askAI('Почему пластик так долго разлагается?')">Почему пластик так долго разлагается?</div>
+            <div class="ai-suggestion" onclick="askAI('Что такое углеродный след?')">Что такое углеродный след?</div>
+            <div class="ai-suggestion" onclick="askAI('Куда сдавать батарейки?')">Куда сдавать батарейки?</div>
+            <div class="ai-suggestion" onclick="askAI('Как экономить воду дома?')">Как экономить воду дома?</div>
+        </div>
+        <div class="ai-input-group">
+            <input type="text" class="ai-input" id="aiInput" placeholder="Ваш вопрос об экологии...">
+            <button class="btn" onclick="sendAIQuestion()">Спросить</button>
+        </div>
+    </div>
+</section>
+
+<!-- Прогресс и достижения -->
+<section id="badges" style="background: var(--bg-light);" class="fade-in">
+    <div class="step-label">Мой прогресс</div>
+    <h3>🏆 Звания и достижения</h3>
+    <p class="section-subtitle">За каждое действие на сайте вы получаете опыт (XP). Опыт повышает звание, а особые задачи открывают значки. Прогресс хранится в этом браузере.</p>
+
+    <div class="big-progress">
+        <div class="current-level" id="bigLevel">🌱 Эко-новичок</div>
+        <div class="progress-line">
+            <div class="progress-fill" id="bigProgressFill"></div>
+        </div>
+        <div class="progress-text" id="bigProgressText">0 XP · до следующего звания 40 XP</div>
+    </div>
+
+    <div class="levels-track" id="levelsTrack">
+        <div class="level-pill active" data-level="1">1. Эко-новичок · 0</div>
+        <div class="level-pill" data-level="2">2. Эко-осознанный · 40</div>
+        <div class="level-pill" data-level="3">3. Эко-активист · 100</div>
+        <div class="level-pill" data-level="4">4. Эко-эксперт · 180</div>
+        <div class="level-pill" data-level="5">5. Эко-лидер · 280</div>
+        <div class="level-pill" data-level="6">6. Эко-хранитель · 400</div>
+    </div>
+
+    <div class="badges-grid" id="badgesGrid"></div>
+
+    <div style="text-align: center; margin-top: 30px;">
+        <button class="btn" onclick="resetProgress()">Сбросить прогресс</button>
+    </div>
+</section>
+
+<!-- Кейсы -->
+<section class="fade-in">
+    <div class="step-label">Дополнительно</div>
+    <h3>💼 Кейсы для обсуждения</h3>
+    <p class="section-subtitle">Готовые ситуации для групповой работы. Можно использовать на уроке или внеурочном занятии.</p>
+
+    <div class="case-card">
+        <h5>Кейс 1. Школьный двор</h5>
+        <p>В школьном дворе решили установить раздельные баки для мусора. Но ученики не понимают, как правильно сортировать отходы, и всё идёт в один бак.</p>
+        <div class="case-questions">
+            <p><strong>Вопросы:</strong></p>
+            <ul>
+                <li>Как научить школьников сортировать отходы?</li>
+                <li>Какие знаки и подсказки помогут?</li>
+                <li>Как мотивировать учеников участвовать?</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="case-card">
+        <h5>Кейс 2. День без пластика</h5>
+        <p>Класс решил провести «День без пластика». Оказалось, что почти вся еда и напитки в упаковке из пластика.</p>
+        <div class="case-questions">
+            <p><strong>Вопросы:</strong></p>
+            <ul>
+                <li>Реально ли прожить день без пластика?</li>
+                <li>Какие альтернативы существуют?</li>
+                <li>Что можно изменить в школьной столовой?</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="case-card">
+        <h5>Кейс 3. Углеродный след школы</h5>
+        <p>Школа решила посчитать свой углеродный след: электричество, отопление, бумага, поездки учеников.</p>
+        <div class="case-questions">
+            <p><strong>Вопросы:</strong></p>
+            <ul>
+                <li>Как посчитать углеродный след школы?</li>
+                <li>Какие источники выбросов самые большие?</li>
+                <li>Что можно сделать для снижения следа?</li>
+            </ul>
+        </div>
+    </div>
+</section>
+
+<!-- Словарь -->
+<section style="background: var(--bg-light);" class="fade-in">
+    <div class="step-label">Справочник</div>
+    <h3>📖 Словарь терминов</h3>
+    <p class="section-subtitle">Ключевые понятия, которые пригодятся на занятии. Нажми на термин, чтобы увидеть определение.</p>
+
+    <div class="accordion-item">
+        <div class="accordion-header" onclick="toggleAccordion(this)">Экология</div>
+        <div class="accordion-body"><p>Наука о взаимодействии живых организмов и окружающей среды. Также — практика защиты природы.</p></div>
+    </div>
+    <div class="accordion-item">
+        <div class="accordion-header" onclick="toggleAccordion(this)">Углеродный след</div>
+        <div class="accordion-body"><p>Количество парниковых газов, которое производит человек, организация или товар. Измеряется в килограммах CO₂-эквивалента.</p></div>
+    </div>
+    <div class="accordion-item">
+        <div class="accordion-header" onclick="toggleAccordion(this)">Рециклинг</div>
+        <div class="accordion-body"><p>Переработка отходов с целью повторного использования. Позволяет экономить ресурсы и снижать количество мусора.</p></div>
+    </div>
+    <div class="accordion-item">
+        <div class="accordion-header" onclick="toggleAccordion(this)">Компостирование</div>
+        <div class="accordion-body"><p>Разложение органических отходов (пищевых, растительных) в удобрение. Помогает уменьшить объём мусора.</p></div>
+    </div>
+    <div class="accordion-item">
+        <div class="accordion-header" onclick="toggleAccordion(this)">Вторичное сырьё</div>
+        <div class="accordion-body"><p>Материалы, которые можно переработать и использовать повторно: бумага, стекло, металл, пластик.</p></div>
+    </div>
+    <div class="accordion-item">
+        <div class="accordion-header" onclick="toggleAccordion(this)">Эко-активизм</div>
+        <div class="accordion-body"><p>Деятельность, направленная на защиту окружающей среды: участие в акциях, экопроектах, распространение знаний.</p></div>
+    </div>
+</section>
+
+<!-- Полезные ссылки -->
+<section class="fade-in">
+    <div class="step-label">Источники</div>
+    <h3>🔗 Полезные ссылки</h3>
+    <p class="section-subtitle">Официальные ресурсы для педагогов и школьников.</p>
+
+    <div class="cards">
+        <div class="card">
+            <h4><span class="card-icon">🌿</span> Минприроды России</h4>
+            <p><a href="https://mnr.gov.ru" target="_blank">mnr.gov.ru</a> — официальная информация об экологии</p>
+        </div>
+        <div class="card">
+            <h4><span class="card-icon">♻️</span> Российский экологический оператор</h4>
+            <p><a href="https://reo.ru" target="_blank">reo.ru</a> — про переработку и обращение с отходами</p>
+        </div>
+        <div class="card">
+            <h4><span class="card-icon">🌍</span> Экокласс</h4>
+            <p><a href="https://ecoclass.me" target="_blank">ecoclass.me</a> — экоуроки для школьников</p>
+        </div>
+        <div class="card">
+            <h4><span class="card-icon">🎓</span> Зелёная школа</h4>
+            <p><a href="https://зеленаяшкола.рф" target="_blank">зеленаяшкола.рф</a> — образовательный проект</p>
+        </div>
+    </div>
+</section>
+
+<!-- Подвал -->
+<footer>
+    <div class="footer-grid">
+        <div>
+            <h6>О проекте</h6>
+            <p>Образовательный сайт «Эко-лаборатория: сохраним планету вместе». Создан с использованием нейросетей.</p>
+        </div>
+        <div>
+            <h6>Разделы</h6>
+            <ul>
+                <li><a onclick="scrollToSection('theory')">Теория</a></li>
+                <li><a onclick="scrollToSection('sorting')">Игра</a></li>
+                <li><a onclick="scrollToSection('quiz')">Тест</a></li>
+                <li><a onclick="scrollToSection('badges')">Достижения</a></li>
+            </ul>
+        </div>
+        <div>
+            <h6>Источники</h6>
+            <ul>
+                <li><a href="https://mnr.gov.ru" target="_blank">Минприроды России</a></li>
+                <li><a href="https://reo.ru" target="_blank">РЭО</a></li>
+                <li><a href="https://ecoclass.me" target="_blank">Экокласс</a></li>
+            </ul>
+        </div>
+    </div>
+    <div class="footer-bottom">
+        © 2026 Эко-лаборатория | Нейросети: ChatGPT, DeepSeek, Алиса AI
+    </div>
+</footer>
+
+<!-- Тост -->
+<div class="toast" id="toast">
+    <div class="toast-icon" id="toastIcon">🏆</div>
+    <div class="toast-text">
+        <div class="toast-title" id="toastTitle">Новый значок!</div>
+        <div id="toastDesc">Описание</div>
+    </div>
+</div>
+
+<script>
+    /* ===== СОСТОЯНИЕ ===== */
+    const state = {
+        xp: parseInt(localStorage.getItem('eco_xp') || '0'),
+        badges: JSON.parse(localStorage.getItem('eco_badges') || '[]'),
+        sortScore: 0,
+        sortErrors: 0,
+        quizScore: 0,
+        currentQuestion: 0,
+        timerInterval: null,
+        timeLeft: 60
+    };
+
+    const LEVELS = [
+        { level: 1, name: '🌱 Эко-новичок', xp: 0 },
+        { level: 2, name: '🌿 Эко-осознанный', xp: 40 },
+        { level: 3, name: '♻️ Эко-активист', xp: 100 },
+        { level: 4, name: '🌍 Эко-эксперт', xp: 180 },
+        { level: 5, name: '🌳 Эко-лидер', xp: 280 },
+        { level: 6, name: '🌎 Эко-хранитель', xp: 400 }
+    ];
+
+    const BADGES = [
+        { id: 'theorist', icon: '📚', name: 'Теоретик', desc: 'Дочитать теорию до конца' },
+        { id: 'sorter', icon: '♻️', name: 'Сортировщик', desc: 'Рассортировать 10 отходов' },
+        { id: 'tracker', icon: '🧮', name: 'Следопыт', desc: 'Рассчитать углеродный след' },
+        { id: 'excellent', icon: '🎯', name: 'Отличник', desc: 'Ответить на все вопросы теста' },
+        { id: 'detective', icon: '🔍', name: 'Эко-детектив', desc: 'Найти 5 экологических проблем' },
+        { id: 'water', icon: '💧', name: 'Водный страж', desc: 'Пройти задание про воду' },
+        { id: 'energy', icon: '⚡', name: 'Энергосберегатель', desc: 'Пройти задание про энергию' },
+        { id: 'gardener', icon: '🌳', name: 'Садовник', desc: 'Посадить виртуальное дерево' },
+        { id: 'curious', icon: '🤔', name: 'Любознательный', desc: 'Задать вопрос ИИ-помощнику' },
+        { id: 'keeper', icon: '🌟', name: 'Наследник Земли', desc: 'Получить звание Эко-хранитель' }
+    ];
+
+    /* ===== ИНИЦИАЛИЗАЦИЯ ===== */
+    function init() {
+        if (localStorage.getItem('eco_theme') === 'dark') {
+            document.body.classList.add('dark');
+            document.getElementById('themeBtn').textContent = '☀️';
+        }
+        updateXP();
+        renderBadges();
+        setupScrollAnimations();
+        setupScrollProgress();
+    }
+
+    /* ===== ТЕМА ===== */
+    function toggleTheme() {
+        document.body.classList.toggle('dark');
+        const btn = document.getElementById('themeBtn');
+        btn.textContent = document.body.classList.contains('dark') ? '☀️' : '🌙';
+        localStorage.setItem('eco_theme', document.body.classList.contains('dark') ? 'dark' : 'light');
+    }
+
+    /* ===== ПРОКРУТКА ===== */
+    function scrollToSection(id) {
+        document.getElementById(id).scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    function setupScrollProgress() {
+        window.addEventListener('scroll', () => {
+            const winScroll = document.documentElement.scrollTop;
+            const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            const scrolled = (winScroll / height) * 100;
+            document.getElementById('progressBar').style.width = scrolled + '%';
+        });
+    }
+
+    function setupScrollAnimations() {
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) entry.target.classList.add('visible');
+            });
+        }, { threshold: 0.1 });
+        document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+    }
+
+    /* ===== XP И УРОВНИ ===== */
+    function addXP(amount) {
+        state.xp += amount;
+        localStorage.setItem('eco_xp', state.xp);
+        updateXP();
+    }
+
+    function updateXP() {
+        document.getElementById('xpCount').textContent = state.xp + ' XP';
+        document.getElementById('xpLevel').textContent = getCurrentLevel().level;
+        document.getElementById('xpTitle').textContent = getCurrentLevel().name;
+        document.getElementById('bigLevel').textContent = getCurrentLevel().name;
+
+        const current = getCurrentLevel();
+        const next = LEVELS[current.level] || current;
+        const progress = next.xp > current.xp
+            ? ((state.xp - current.xp) / (next.xp - current.xp)) * 100
+            : 100;
+
+        document.getElementById('xpBarMini').style.width = progress + '%';
+        document.getElementById('bigProgressFill').style.width = progress + '%';
+
+        if (next !== current) {
+            document.getElementById('bigProgressText').textContent =
+                `${state.xp} XP · до звания «${next.name}» осталось ${next.xp - state.xp} XP`;
+        } else {
+            document.getElementById('bigProgressText').textContent =
+                `${state.xp} XP · максимальное звание достигнуто`;
+        }
+
+        document.querySelectorAll('.level-pill').forEach(pill => {
+            const lvl = parseInt(pill.dataset.level);
+            pill.classList.toggle('active', lvl === current.level);
+            pill.classList.toggle('reached', lvl <= current.level);
+        });
+
+        if (current.level === 6 && !state.badges.includes('keeper')) {
+            earnBadge('keeper');
+        }
+    }
+
+    function getCurrentLevel() {
+        let current = LEVELS[0];
+        for (const lvl of LEVELS) {
+            if (state.xp >= lvl.xp) current = lvl;
+        }
+        return current;
+    }
+
+    /* ===== ЗНАЧКИ ===== */
+    function renderBadges() {
+        const grid = document.getElementById('badgesGrid');
+        grid.innerHTML = BADGES.map(b => `
+            <div class="badge ${state.badges.includes(b.id) ? 'earned' : ''}" id="badge-${b.id}">
+                <span class="badge-icon">${b.icon}</span>
+                <div class="badge-name">${b.name}</div>
+                <div class="badge-desc">${b.desc}</div>
+            </div>
+        `).join('');
+    }
+
+    function claimBadge(id) {
+        const badge = BADGES.find(b => b.id === id);
+        if (!badge || state.badges.includes(id)) return;
+        earnBadge(id);
+        const xpMap = { theorist: 10, tracker: 25 };
+        if (xpMap[id]) addXP(xpMap[id]);
+    }
+
+    function earnBadge(id) {
+        if (state.badges.includes(id)) return;
+        const badge = BADGES.find(b => b.id === id);
+        state.badges.push(id);
+        localStorage.setItem('eco_badges', JSON.stringify(state.badges));
+        renderBadges();
+        showToast(badge.icon, 'Новый значок: ' + badge.name, badge.desc);
+    }
+
+    function showToast(icon, title, desc) {
+        const toast = document.getElementById('toast');
+        document.getElementById('toastIcon').textContent = icon;
+        document.getElementById('toastTitle').textContent = title;
+        document.getElementById('toastDesc').textContent = desc;
+        toast.classList.add('show');
+        setTimeout(() => toast.classList.remove('show'), 4000);
+    }
+
+    function resetProgress() {
+        if (!confirm('Сбросить весь прогресс?')) return;
+        state.xp = 0;
+        state.badges = [];
+        localStorage.removeItem('eco_xp');
+        localStorage.removeItem('eco_badges');
+        updateXP();
+        renderBadges();
+    }
+
+    /* ===== АККОРДЕОН ===== */
+    function toggleAccordion(header) {
+        header.parentElement.classList.toggle('active');
+    }
+
+    /* ===== ИГРА СОРТИРОВКИ ===== */
+    const WASTE_ITEMS = [
+        { emoji: '🍶', name: 'Пластиковая бутылка', bin: 'blue' },
+        { emoji: '🍎', name: 'Яблочный огрызок', bin: 'green' },
+        { emoji: '🔋', name: 'Батарейка', bin: 'yellow' },
+        { emoji: '📰', name: 'Старая газета', bin: 'blue' },
+        { emoji: '🥫', name: 'Жестяная банка', bin: 'blue' },
+        { emoji: '💊', name: 'Просроченные лекарства', bin: 'yellow' },
+        { emoji: '🍌', name: 'Банановая кожура', bin: 'green' },
+        { emoji: '🧴', name: 'Пластиковый флакон', bin: 'blue' },
+        { emoji: '🪫', name: 'Разряженная батарейка', bin: 'yellow' },
+        { emoji: '🍂', name: 'Опавшие листья', bin: 'green' },
+        { emoji: '💡', name: 'Лампочка', bin: 'yellow' },
+        { emoji: '🥤', name: 'Одноразовый стакан', bin: 'red' }
+    ];
+
+    let currentWaste = 0;
+    let sortGameStarted = false;
+
+    function startSortGame() {
+        sortGameStarted = true;
+        state.sortScore = 0;
+        state.sortErrors = 0;
+        currentWaste = 0;
+        document.getElementById('sortScore').textContent = '0';
+        document.getElementById('sortErrors').textContent = '0';
+        document.getElementById('sortStartBtn').style.display = 'none';
+        showWaste();
+    }
+
+    function showWaste() {
+        const waste = WASTE_ITEMS[currentWaste % WASTE_ITEMS.length];
+        document.getElementById('wasteEmoji').textContent = waste.emoji;
+        document.getElementById('wasteName').textContent = waste.name;
+        document.getElementById('sortFeedback').className = 'game-feedback';
+        document.getElementById('sortNextBtn').style.display = 'none';
+        document.querySelectorAll('.bin').forEach(b => b.classList.remove('correct', 'wrong'));
+    }
+
+    function sortWaste(bin) {
+        if (!sortGameStarted) return;
+        const waste = WASTE_ITEMS[currentWaste % WASTE_ITEMS.length];
+        const feedback = document.getElementById('sortFeedback');
+
+        document.querySelectorAll('.bin').forEach(b => {
+            b.onclick = null;
+        });
+
+        if (bin === waste.bin) {
+            state.sortScore++;
+            document.getElementById('sortScore').textContent = state.sortScore;
+            feedback.className = 'game-feedback show success';
+            feedback.textContent = '✅ Верно! Это идёт в правильный бак.';
+            event.target.closest('.bin').classList.add('correct');
+            addXP(3);
+        } else {
+            state.sortErrors++;
+            document.getElementById('sortErrors').textContent = state.sortErrors;
+            const correctBinName = { blue: 'Переработка', green: 'Органика', yellow: 'Опасные', red: 'Смешанные' }[waste.bin];
+            feedback.className = 'game-feedback show error';
+            feedback.textContent = `❌ Неверно. Правильный бак: ${correctBinName}.`;
+            event.target.closest('.bin').classList.add('wrong');
+        }
+
+        if (state.sortScore >= 10 && !state.badges.includes('sorter')) {
+            earnBadge('sorter');
+            addXP(30);
+            feedback.textContent += ' 🎉 Ты получил значок «Сортировщик»!';
+        }
+
+        document.getElementById('sortNextBtn').style.display = 'block';
+    }
+
+    function nextWaste() {
+        currentWaste++;
+        document.querySelectorAll('.bin').forEach(b => {
+            b.classList.remove('correct', 'wrong');
+        });
+        showWaste();
+        attachBinHandlers();
+    }
+
+    function attachBinHandlers() {
+        const bins = document.querySelectorAll('.bin');
+        const handlers = ['blue', 'green', 'yellow', 'red'];
+        bins.forEach((bin, i) => {
+            bin.onclick = () => sortWaste(handlers[i]);
+        });
+    }
+
+    /* ===== КАЛЬКУЛЯТОР ===== */
+    function updateCalc() {
+        const car = parseInt(document.getElementById('carRange').value);
+        const fly = parseInt(document.getElementById('flyRange').value);
+        const meat = parseInt(document.getElementById('meatRange').value);
+        const light = parseInt(document.getElementById('lightRange').value);
+
+        document.getElementById('carValue').textContent = car + ' км';
+        document.getElementById('flyValue').textContent = fly;
+        document.getElementById('meatValue').textContent = meat;
+        document.getElementById('lightValue').textContent = light + ' ч';
+
+        // Расчёт: машина 0.2 кг/км, самолёт 150 кг/полёт, мясо 2.5 кг/порция, свет 0.05 кг/ч
+        const total = Math.round(car * 52 * 0.2 + fly * 150 + meat * 52 * 2.5 + light * 365 * 0.05);
+        document.getElementById('calcTotal').textContent = total.toLocaleString('ru-RU');
+
+        let tip = '';
+        if (total < 3000) tip = '🌱 Отличный результат! Ты производишь меньше среднего россиянина.';
+        else if (total < 8000) tip = '🌿 Хорошо, но есть что улучшить. Попробуй больше ходить пешком.';
+        else if (total < 15000) tip = '⚠️ Твой след выше среднего. Подумай о снижении поездок на машине.';
+        else tip = '🚨 Высокий след. Рекомендуем пересмотреть привычки питания и транспорта.';
+
+        document.getElementById('calcTip').textContent = tip;
+    }
+
+    /* ===== ТЕСТ ===== */
+    const QUIZ_QUESTIONS = [
+        {
+            q: 'Сколько лет разлагается пластиковая бутылка?',
+            options: ['10 лет', '100 лет', '400–1000 лет', 'Она не разлагается'],
+            correct: 2
+        },
+        {
+            q: 'В какой бак нужно выбрасывать батарейки?',
+            options: ['Синий (переработка)', 'Зелёный (органика)', 'Жёлтый (опасные)', 'Красный (смешанные)'],
+            correct: 2
+        },
+        {
+            q: 'Что такое углеродный след?',
+            options: ['Следы от обуви', 'Количество парниковых газов', 'Загрязнение воды', 'Пятно на одежде'],
+            correct: 1
+        },
+        {
+            q: 'Что можно сделать из 1 тонны переработанного пластика?',
+            options: ['1 футболку', '2000 футболок', '100 кг бумаги', 'Ничего'],
+            correct: 1
+        },
+        {
+            q: 'Какая привычка помогает снизить углеродный след?',
+            options: ['Больше ездить на машине', 'Меньше есть мяса', 'Чаще менять телефон', 'Использовать больше пластика'],
+            correct: 1
+        }
+    ];
+
+    function startQuiz() {
+        state.currentQuestion = 0;
+        state.quizScore = 0;
+        document.getElementById('quizStartBtn').style.display = 'none';
+        document.getElementById('quizResult').className = '';
+        document.getElementById('quizResult').style.display = 'none';
+        renderQuestion();
+    }
+
+    function renderQuestion() {
+        const q = QUIZ_QUESTIONS[state.currentQuestion];
+        document.getElementById('quizProgress').textContent = `Вопрос ${state.currentQuestion + 1} из ${QUIZ_QUESTIONS.length}`;
+
+        let html = `<div class="question"><p>${q.q}</p>`;
+        q.options.forEach((opt, i) => {
+            html += `<label><input type="radio" name="q" value="${i}"> ${opt}</label>`;
+        });
+        html += `</div>`;
+        document.getElementById('quizForm').innerHTML = html;
+
+        document.getElementById('quizNextBtn').style.display = 'block';
+        document.getElementById('quizNextBtn').textContent =
+            state.currentQuestion < QUIZ_QUESTIONS.length - 1 ? 'Ответить →' : 'Завершить';
+
+        startTimer();
+    }
+
+    function startTimer() {
+        clearInterval(state.timerInterval);
+        state.timeLeft = 60;
+        document.getElementById('quizTimer').textContent = '⏱ ' + state.timeLeft;
+        state.timerInterval = setInterval(() => {
+            state.timeLeft--;
+            document.getElementById('quizTimer').textContent = '⏱ ' + state.timeLeft;
+            if (state.timeLeft <= 0) {
+                clearInterval(state.timerInterval);
+                nextQuestion();
+            }
+        }, 1000);
+    }
+
+    function nextQuestion() {
+        clearInterval(state.timerInterval);
+        const selected = document.querySelector('input[name="q"]:checked');
+
+        if (selected && parseInt(selected.value) === QUIZ_QUESTIONS[state.currentQuestion].correct) {
+            state.quizScore++;
+            addXP(5);
+        }
+
+        if (state.currentQuestion < QUIZ_QUESTIONS.length - 1) {
+            state.currentQuestion++;
+            renderQuestion();
+        } else {
+            showQuizResult();
+        }
+    }
+
+    function showQuizResult() {
+        document.getElementById('quizForm').innerHTML = '';
+        document.getElementById('quizNextBtn').style.display = 'none';
+        document.getElementById('quizTimer').style.display = 'none';
+
+        const resultDiv = document.getElementById('quizResult');
+        const percent = (state.quizScore / QUIZ_QUESTIONS.length) * 100;
+
+        let message, color;
+        if (percent === 100) {
+            message = '🏅 Отлично! Ты настоящий эко-эксперт!';
+            color = '#1a5c3a';
+            if (!state.badges.includes('excellent')) {
+                earnBadge('excellent');
+                addXP(50);
+            }
+        } else if (percent >= 60) {
+            message = '📋 Хорошо! Но есть что повторить.';
+            color = '#f0ad4e';
+        } else {
+            message = '📝 Вернись к теории и попробуй снова.';
+            color = '#d9534f';
+        }
+
+        resultDiv.style.background = color + '20';
+        resultDiv.style.color = color;
+        resultDiv.innerHTML = `Твой результат: ${state.quizScore} из ${QUIZ_QUESTIONS.length}<br>${message}`;
+        resultDiv.className = 'show';
+        resultDiv.style.display = 'block';
+
+        document.getElementById('quizStartBtn').style.display = 'block';
+        document.getElementById('quizStartBtn').textContent = 'Пройти заново';
+        document.getElementById('quizTimer').style.display = 'block';
+    }
+
+    /* ===== ИИ-ПОМОЩНИК ===== */
+    const AI_RESPONSES = {
+        'пластик': 'Пластик разлагается от 400 до 1000 лет, потому что его молекулы очень устойчивы к воздействию бактерий и природных факторов. Именно поэтому важно сдавать пластик в переработку.',
+        'углеродный след': 'Углеродный след — это количество парниковых газов (в основном CO₂), которое производит человек, организация или товар. Средний россиянин производит около 12 тонн CO₂ в год.',
+        'батарейки': 'Батарейки нельзя выбрасывать в обычный мусор — они содержат тяжёлые металлы. Их нужно сдавать в специальные пункты приёма. Часто такие контейнеры стоят в магазинах электроники.',
+        'воду': 'Экономить воду просто: закрывай кран, пока чистишь зубы, принимай душ вместо ванны, используй посудомоечную машину при полной загрузке. Это экономит до 50 литров в день.',
+        'мусор': 'Сортировка мусора — самый простой шаг к экологии. Разделяй отходы на 4 категории: переработка (синий), органика (зелёный), опасные (жёлтый), смешанные (красный).',
+        'дерево': 'Одно дерево за год поглощает около 20 кг CO₂ и выделяет кислород для 2 человек. Посадка деревьев — один из самых эффективных способов снизить углеродный след.'
+    };
+
+    function askAI(question) {
+        if (!state.badges.includes('curious')) {
+            earnBadge('curious');
+            addXP(15);
+        }
+        const chat = document.getElementById('aiChat');
+        chat.innerHTML += `<div class="ai-message" style="background:#d4edda;margin-left:auto;">
+            <div class="ai-role">Вы</div>${question}</div>`;
+
+        setTimeout(() => {
+            let response = 'Хороший вопрос! Попробуй уточнить его или выбери один из готовых вопросов ниже.';
+            const q = question.toLowerCase();
+            for (const key in AI_RESPONSES) {
+                if (q.includes(key)) {
+                    response = AI_RESPONSES[key];
+                    break;
+                }
+            }
+            chat.innerHTML += `<div class="ai-message">
+                <div class="ai-role">Эколог</div>${response}</div>`;
+            chat.scrollTop = chat.scrollHeight;
+        }, 500);
+    }
+
+    function sendAIQuestion() {
+        const input = document.getElementById('aiInput');
+        const question = input.value.trim();
+        if (!question) return;
+        askAI(question);
+        input.value = '';
+    }
+
+    document.getElementById('aiInput').addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') sendAIQuestion();
+    });
+
+    /* ===== ЗАПУСК ===== */
+    init();
+    updateCalc();
+    attachBinHandlers();
+</script>
+
+</body>
+</html>
